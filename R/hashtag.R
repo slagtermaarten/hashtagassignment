@@ -56,3 +56,13 @@ compute_hashtag_stats <- function(hashtag_counts, fd_thresh = 2,
   return(stats)
 }
 
+
+filter_seurat_stats <- function(seurat_object, stats) {
+  allowed_sample_ids <- stats %>% 
+    dplyr::filter(fd_crit == T & evenness_crit == T & read_crit == T) %>%
+    pull(sample_id) %>%
+    intersect(colnames(seurat_object))
+  ret_val <- tryCatch(seurat_object[, allowed_sample_ids], 
+                      error = function(e) { print(e); NULL }) 
+  return(ret_val)
+}

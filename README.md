@@ -25,9 +25,11 @@ distributed across hash tags.
 ## Installation
 
 ``` r
-# install.packages("devtools")
-devtools::install("~/libs/hashtagassignment")
-devtools::install_github("slagtermaarten/hashtagassignment")
+if (!require('hashtagassignment')) {
+  # install.packages("devtools")
+  # devtools::install("~/libs/hashtagassignment")
+  devtools::install_github("slagtermaarten/hashtagassignment")
+}
 library(hashtagassignment)
 ```
 
@@ -37,7 +39,6 @@ library(hashtagassignment)
 library(dplyr)
 data_dir <- '/DATA/users/m.slagter/MirjamHoekstra/raw_exp_5310'
 hashtag_counts <- extract_hashtags_from_cellranger(data_dir = data_dir)
-#> 10X data contains more than one type and is being returned as a list containing matrices of each type.
 
 ## Define thresholds
 ## Cells need the winning hash tag to be at least 2^2 (=4) times larger than the
@@ -51,7 +52,18 @@ stats <- compute_hashtag_stats(hashtag_counts,
                                fd_thresh = fd_thresh,
                                evenness_thresh = evenness_thresh, 
                                read_thresh = read_thresh)
+
+## Filter for cells that do meet all of the criteria 
+if (exists('seurat_object')) {
+  # seurat_object <- load_seurat('exp5310')
+  # rownames(seurat_object@meta.data) <- 
+  #   names(seurat_object@active.ident) <-
+  #   gsub('5310_', '', rownames(seurat_object@meta.data))
+  filtered_seurat_object <- filter_seurat_stats(seurat_object, stats)
+}
 ```
+
+    ## <simpleError in CellsByIdentities(object = object, cells = cells): Cannot find cells provided>
 
 Select cells to serve as examples for different levels of evenness (\[0,
 .1, .2, …\]). Notice how the distributions get more fuzzy as evenness
@@ -136,12 +148,4 @@ p5 <- stats %>%
 (p1 + p2) / (p4 + p5) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
-
-## Filter Seurat object down to ‘valid’ cells
-
-TO DO
-
-``` r
-seurat_object
-```
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->

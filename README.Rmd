@@ -36,9 +36,11 @@ hash tags.
 ## Installation
 
 ```{r, eval = FALSE}
-# install.packages("devtools")
-devtools::install("~/libs/hashtagassignment")
-devtools::install_github("slagtermaarten/hashtagassignment")
+if (!require('hashtagassignment')) {
+  # install.packages("devtools")
+  # devtools::install("~/libs/hashtagassignment")
+  devtools::install_github("slagtermaarten/hashtagassignment")
+}
 library(hashtagassignment)
 ```
 
@@ -65,6 +67,15 @@ stats <- compute_hashtag_stats(hashtag_counts,
                                fd_thresh = fd_thresh,
                                evenness_thresh = evenness_thresh, 
                                read_thresh = read_thresh)
+
+## Filter for cells that do meet all of the criteria 
+if (exists('seurat_object')) {
+  # seurat_object <- load_seurat('exp5310')
+  # rownames(seurat_object@meta.data) <- 
+  #   names(seurat_object@active.ident) <-
+  #   gsub('5310_', '', rownames(seurat_object@meta.data))
+  filtered_seurat_object <- filter_seurat_stats(seurat_object, stats)
+}
 ```
 
 Select cells to serve as examples for different levels of evenness ([0, .1, .2,
@@ -124,12 +135,4 @@ p5 <- stats %>%
   gridExtra::tableGrob(theme = gridExtra::ttheme_default(base_size = 6))
 
 (p1 + p2) / (p4 + p5) 
-```
-
-## Filter Seurat object down to 'valid' cells
-
-TO DO
-
-```{r, eval = FALSE, warning=FALSE}
-seurat_object
 ```
