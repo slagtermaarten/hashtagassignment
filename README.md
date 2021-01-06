@@ -1,25 +1,43 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# hashtagassign
+# hashtagassignment
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of hashtagassign is to …
+In 10x and other single cell sequencing technologies, antibody barcodes
+are routinely added to cells before sequencing in order to multiplex
+multiple experiments in a single sequencing run. Existing hash tag
+assignment strategies (e.g. HTODemux) implicitly assume total hash tag
+read counts to be identical between cells, but this assumption is false.
+We observed a strong correlation between the total hash tag read counts
+and the number of unique UMIs. The strategy presented here therefore
+doesn’t use hashtag thresholds that are shared across cells, but rather
+determines the most likely hashtag on a per cell basis. It removes
+doublets and low confident cells by thresholding on i) the log2 ratio of
+the maximal hash tag’s read count with the second best hash tag ii) the
+‘evenness’ (normalized entropy) of hash tag counts and iii) the total
+number of reads assigned to hash tags. The second metric will be low if
+one hash tag clearly is the winner and higher if reads are more evenly
+distributed across hash tags.
 
 ## Installation
 
 ``` r
 # install.packages("devtools")
+devtools::install("~/libs/hashtagassignment")
 devtools::install_github("slagtermaarten/hashtagassignment")
+library(hashtagassignment)
 ```
 
+## Example usage
+
 ``` r
-# library(hashtagassign)
+library(dplyr)
 data_dir <- '/DATA/users/m.slagter/MirjamHoekstra/raw_exp_5310'
 hashtag_counts <- extract_hashtags_from_cellranger(data_dir = data_dir)
-stats <- compute_hashtag_stats(hashtag_counts)
+#> 10X data contains more than one type and is being returned as a list containing matrices of each type.
 
 ## Define thresholds
 ## Cells need the winning hash tag to be at least 2^2 (=4) times larger than the
@@ -29,6 +47,10 @@ fd_thresh = 2
 evenness_thresh = .5
 ## Minimal amount of hash tag reads cells need to have
 read_thresh = 100
+stats <- compute_hashtag_stats(hashtag_counts, 
+                               fd_thresh = fd_thresh,
+                               evenness_thresh = evenness_thresh, 
+                               read_thresh = read_thresh)
 ```
 
 Select cells to serve as examples for different levels of evenness (\[0,
@@ -100,21 +122,12 @@ p2 <- ggplot(mapping = aes(x = hashtag_evenness, y = fd_cc),
   ylab('log2 fold difference\n of winning\n with closest contender') +
   ggplot2::theme(legend.position = c(.95, .95), legend.justification = c(1, 1))
 
-p4 <- ggplot(mapping = aes(x = hashtag_evenness),
-             data = stats) +
-  stat_ecdf() +
-  xlab('Hashtag evennness') +
-  ylab('Cumulative fraction of cells')
-
 p4 <- ggplot(mapping = aes(x = hashtag_evenness), data = stats) +
   geom_histogram(bins = 100) +
   xlab('Hashtag evennness') +
   ylab('Number of cells')
 
 p5 <- stats %>%
-  dplyr::mutate(fd_crit = is.na(fd_cc) | fd_cc >= fd_thresh) %>%
-  dplyr::mutate(evenness_crit = hashtag_evenness <= evenness_thresh) %>%
-  dplyr::mutate(read_crit = total_hashtag_reads >= read_thresh) %>%
   dplyr::group_by(fd_crit, evenness_crit, read_crit) %>%
   dplyr::count() %>%
   dplyr::mutate(frac = round(n / nrow(stats), 3)) %>%
@@ -123,4 +136,12 @@ p5 <- stats %>%
 (p1 + p2) / (p4 + p5) 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+## Filter Seurat object down to ‘valid’ cells
+
+TO DO
+
+``` r
+seurat_object
+```

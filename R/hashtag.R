@@ -3,7 +3,7 @@
 #'
 #'
 compute_fdcc <- function(hash_tag_counts) {
-  if (is.null(hash_tag_counts) || uniqueN(hash_tag_counts) == 2) {
+  if (is.null(hash_tag_counts) || length(unique(hash_tag_counts)) == 2) {
     return(NA)
   }
   count_order <- order(hash_tag_counts)
@@ -39,7 +39,8 @@ extract_hashtags_from_cellranger <- function(
 }
 
 
-compute_hashtag_stats <- function(hashtag_counts) {
+compute_hashtag_stats <- function(hashtag_counts, fd_thresh = 2, 
+                                  evenness_thresh = .5, read_thresh = 100) {
   stats <-
     data.frame(
       fd_cc = apply(hashtag_counts, 2, compute_fdcc),
@@ -48,7 +49,10 @@ compute_hashtag_stats <- function(hashtag_counts) {
       total_hashtag_reads = apply(hashtag_counts, 2, sum, na.rm = T)
     ) %>%
     cbind(t(as.data.frame(hashtag_counts))) %>%
-    tibble::rownames_to_column('sample_id')
+    tibble::rownames_to_column('sample_id') %>%
+    dplyr::mutate(fd_crit = is.na(fd_cc) | fd_cc >= fd_thresh) %>%
+    dplyr::mutate(evenness_crit = hashtag_evenness <= evenness_thresh) %>%
+    dplyr::mutate(read_crit = total_hashtag_reads >= read_thresh)
   return(stats)
 }
 
