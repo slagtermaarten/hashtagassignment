@@ -52,7 +52,8 @@ compute_hashtag_stats <- function(hashtag_counts, fd_thresh = 2,
     tibble::rownames_to_column('sample_id') %>%
     dplyr::mutate(fd_crit = is.na(fd_cc) | fd_cc >= fd_thresh) %>%
     dplyr::mutate(evenness_crit = hashtag_evenness <= evenness_thresh) %>%
-    dplyr::mutate(read_crit = total_hashtag_reads >= read_thresh)
+    dplyr::mutate(read_crit = total_hashtag_reads >= read_thresh) %>%
+    dplyr::mutate(all_crit = fd_crit & evenness_crit & read_crit)
   return(stats)
 }
 
