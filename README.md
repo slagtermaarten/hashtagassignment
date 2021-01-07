@@ -154,7 +154,7 @@ p5 <- stats %>%
 
 ![](README_files/figure-gfm/hists-1.png)<!-- -->
 
-# Comparison with HTODemux
+## Comparison with HTODemux
 
 ``` r
 seurat_object <- load_seurat('exp5310', appendix = '')
@@ -242,7 +242,7 @@ merged_stats %>%
 | TAACACGAGTTGTAAG |   5.09 |             0.187 |                 1 |                    72 |              67 |               1 |               1 |               1 |               1 |               0 |               1 | TRUE     | TRUE           | TRUE       | TRUE      | Negative                       | Negative                   |         957 |
 | GAGCCTGTCCGTCAAA |   2.29 |             0.370 |                 3 |                   553 |              88 |               1 |             433 |               6 |              18 |               3 |               4 | TRUE     | TRUE           | TRUE       | TRUE      | human-Hashtag3\_human-Hashtag5 | Doublet                    |       78372 |
 
-# Choosing between two evils
+## Choosing between two evils
 
 `HTODemux` is appropriate when the major and only factor driving hash
 tag reads is intrinsic to the hash tags: some barcode antibodies might

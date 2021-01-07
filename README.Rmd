@@ -145,7 +145,7 @@ p5 <- stats %>%
 (p1 + p2) / (p4 + p5) 
 ```
 
-# Comparison with HTODemux
+## Comparison with HTODemux
 
 ```{r, warning=FALSE}
 seurat_object <- load_seurat('exp5310', appendix = '')
@@ -210,7 +210,7 @@ merged_stats %>%
   knitr::kable()
 ```
 
-# Choosing between two evils
+## Choosing between two evils
 
 `HTODemux` is appropriate when the major and only factor driving hash tag reads is
 intrinsic to the hash tags: some barcode antibodies might be more easily
