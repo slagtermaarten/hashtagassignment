@@ -240,9 +240,11 @@ as.data.frame(t(hashtag_counts)) %>%
 ```
 
 There is, however, a relationship between the amount of detected UMIs and total
-hash tag reads, arguing that cell intrinsic factors also play a role. `HTODemux`
-currently does not consider this source of bias and could benefit from doing so.
-In conclusion, neither strategy seems optimal currently.
+hash tag reads, arguing that cell intrinsic factors also play a role, albeit
+weaker than I initially thought. `HTODemux` currently does not consider this
+source of bias and could benefit from doing so.  An easy, perhaps naive, way of
+implementing this would be to first compute cell intrinsic factors, correct hash
+tag counts for these factors, and then run `HTODemux` as usual.
 
 ```{r, umi_hashtag_correlation, warning=FALSE}
 ggplot(merged_stats, aes(x = nCount_RNA, y = total_hashtag_reads)) + 
